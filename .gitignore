@@ -216,3 +216,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# DoughAI recommendation log (local run data, not source)
+data/*.jsonl
