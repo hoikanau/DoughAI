@@ -10,36 +10,10 @@ permissions:
   contents: read
 
 jobs:
-  codeql:
-    name: CodeQL
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      security-events: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Check for Python source
-        id: has-python
-        run: |
-          if git ls-files '*.py' | grep -q .; then
-            echo "found=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "found=false" >> "$GITHUB_OUTPUT"
-            echo "No Python source files yet, skipping CodeQL."
-          fi
-
-      - name: Initialize CodeQL
-        if: steps.has-python.outputs.found == 'true'
-        uses: github/codeql-action/init@v3
-        with:
-          languages: python
-
-      - name: Perform CodeQL analysis
-        if: steps.has-python.outputs.found == 'true'
-        uses: github/codeql-action/analyze@v3
-
+  # CodeQL scanning is handled by GitHub's Default Setup (Settings > Code security >
+  # Code scanning) instead of a workflow-defined job here — GitHub rejects results
+  # from an advanced/workflow CodeQL config while Default Setup is enabled for the
+  # repo, and this job added no custom queries beyond what Default Setup already runs.
   dependency-review:
     name: Dependency Review
     if: github.event_name == 'pull_request'
