@@ -20,12 +20,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Check for Python source
+        id: has-python
+        run: |
+          if git ls-files '*.py' | grep -q .; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            echo "No Python source files yet, skipping CodeQL."
+          fi
+
       - name: Initialize CodeQL
+        if: steps.has-python.outputs.found == 'true'
         uses: github/codeql-action/init@v3
         with:
           languages: python
 
       - name: Perform CodeQL analysis
+        if: steps.has-python.outputs.found == 'true'
         uses: github/codeql-action/analyze@v3
 
   dependency-review:
