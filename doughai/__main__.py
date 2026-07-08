@@ -5,9 +5,15 @@ from __future__ import annotations
 import argparse
 import sys
 
-from .agent import run_agent
-from .recommendation_log import log_verdict
-from .report import render_markdown
+from dotenv import load_dotenv
+
+# Must run before importing .agent/.tools — they read env vars (ANTHROPIC_API_KEY,
+# SEC_EDGAR_USER_AGENT) at import/construction time.
+load_dotenv()
+
+from .agent import run_agent  # noqa: E402
+from .recommendation_log import log_verdict  # noqa: E402
+from .report import render_markdown  # noqa: E402
 
 
 def main() -> None:
