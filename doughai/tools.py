@@ -77,6 +77,21 @@ def get_price_history(ticker: str, period: str = "6mo") -> dict:
     }
 
 
+def get_price_series(ticker: str, period: str = "6mo") -> list[dict]:
+    """Fetch a plain date/close series for charting.
+
+    Not registered as an agent tool -- the agent gets summarized stats via
+    get_price_history(); this is purely for the dashboard's price chart.
+    """
+    hist = yf.Ticker(ticker).history(period=period)
+    if hist.empty:
+        return []
+    return [
+        {"date": index.strftime("%Y-%m-%d"), "close": round(close, 2)}
+        for index, close in hist["Close"].items()
+    ]
+
+
 def get_fundamentals(ticker: str) -> dict:
     """Fetch valuation and fundamental metrics for a ticker."""
     info = yf.Ticker(ticker).info

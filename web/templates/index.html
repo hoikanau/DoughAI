@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}DoughAI{% endblock %}
+{% block content %}
+<form class="search" action="/ticker/AAPL" method="get" onsubmit="event.preventDefault(); window.location = '/ticker/' + document.getElementById('ticker-input').value.trim().toUpperCase();">
+  <input id="ticker-input" name="ticker" placeholder="Ticker, e.g. AAPL" autocapitalize="characters" required>
+  <button type="submit">Analyze</button>
+</form>
+
+<section>
+  <h2>Watchlist</h2>
+  {% if not watchlist %}
+    <p class="muted">No watchlist configured (set DIGEST_TICKERS).</p>
+  {% endif %}
+  {% for ticker, verdict in watchlist %}
+    <a class="watchlist-item" href="/ticker/{{ ticker }}">
+      <span>{{ ticker }}</span>
+      {% if verdict %}
+        <span class="badge {{ verdict.verdict }}">{{ verdict.verdict }}</span>
+      {% else %}
+        <span class="muted">not yet analyzed</span>
+      {% endif %}
+    </a>
+  {% endfor %}
+</section>
+{% endblock %}

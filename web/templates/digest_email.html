@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; color: #1a1a1a; max-width: 640px; margin: 0 auto;">
+  <h1 style="font-size: 1.2rem;">DoughAI daily digest</h1>
+  <p style="font-size: 0.85rem; color: #666; border-left: 3px solid #ddd; padding-left: 0.75rem;">
+    <strong>Not financial advice.</strong> Informational signals derived from public data
+    and probabilistic language-model reasoning. Treat as one input among many, not a directive.
+  </p>
+
+  {% for verdict in verdicts %}
+  <div style="padding: 1rem 0; border-bottom: 1px solid #ddd;">
+    <h2 style="font-size: 1rem; margin-bottom: 0.25rem;">
+      {{ verdict.ticker }} — {{ verdict.verdict }}
+      <span style="font-weight: normal; color: #666;">(confidence {{ verdict.confidence }})</span>
+    </h2>
+    <p style="margin: 0.25rem 0;">{{ verdict.reasoning }}</p>
+    {% if verdict.key_risks %}
+    <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #666;">
+      Risks: {{ verdict.key_risks | join('; ') }}
+    </p>
+    {% endif %}
+  </div>
+  {% endfor %}
+
+  <p style="font-size: 0.8rem; color: #999;">Generated {{ generated_at }}</p>
+</body>
+</html>

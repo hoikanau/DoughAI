@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}{{ ticker }} — DoughAI{% endblock %}
+{% block content %}
+<section>
+  <h2>{{ ticker }}</h2>
+  <p>
+    <span class="badge {{ verdict.verdict }}">{{ verdict.verdict }}</span>
+    confidence {{ verdict.confidence }} · {{ verdict.time_horizon }}
+    · generated {{ verdict.generated_at }}
+  </p>
+  <form method="post" action="/ticker/{{ ticker }}/refresh" onsubmit="event.preventDefault(); this.querySelector('button').textContent = 'Analyzing…'; fetch(this.action, {method: 'POST'}).then(() => location.reload());">
+    <button class="refresh" type="submit">Re-analyze now</button>
+  </form>
+</section>
+
+{% if verdict.parse_error %}
+<section>
+  <p>The agent's response could not be parsed as JSON.</p>
+  <pre>{{ verdict.raw_response }}</pre>
+</section>
+{% else %}
+
+<section>
+  <h2>Price</h2>
+  <canvas id="price-chart" height="120"></canvas>
+</section>
+
+<section>
+  <h2>Reasoning</h2>
+  <p>{{ verdict.reasoning }}</p>
+</section>
+
+{% if verdict.supporting_evidence %}
+<section>
+  <h2>Supporting evidence</h2>
+  <ul class="evidence-list">
+    {% for item in verdict.supporting_evidence %}<li>{{ item }}</li>{% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+{% if verdict.key_risks %}
+<section>
+  <h2>Key risks</h2>
+  <ul class="evidence-list">
+    {% for item in verdict.key_risks %}<li>{{ item }}</li>{% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+{% if verdict.sources %}
+<section>
+  <h2>Sources</h2>
+  <ul class="evidence-list">
+    {% for item in verdict.sources %}<li><a href="{{ item }}">{{ item }}</a></li>{% endfor %}
+  </ul>
+</section>
+{% endif %}
+{% endif %}
+
+{% if history %}
+<section>
+  <h2>History</h2>
+  {% for entry in history %}
+    <div class="history-row">
+      <span class="badge {{ entry.verdict }}">{{ entry.verdict }}</span>
+      <span class="muted">{{ entry.generated_at }}</span>
+      <span class="muted">confidence {{ entry.confidence }}</span>
+    </div>
+  {% endfor %}
+</section>
+{% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script>
+  const priceSeries = {{ price_series_json | safe }};
+  if (priceSeries.length) {
+    new Chart(document.getElementById('price-chart'), {
+      type: 'line',
+      data: {
+        labels: priceSeries.map(p => p.date),
+        datasets: [{ label: '{{ ticker }} close', data: priceSeries.map(p => p.close), pointRadius: 0 }],
+      },
+      options: { scales: { x: { ticks: { maxTicksLimit: 8 } } } },
+    });
+  }
+</script>
+{% endblock %}
